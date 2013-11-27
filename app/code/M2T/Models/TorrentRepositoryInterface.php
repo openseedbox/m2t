@@ -1,0 +1,19 @@
+<?php
+
+namespace M2T\Models;
+
+interface TorrentRepositoryInterface {
+
+	public function getByHash($hash);
+
+	public function add($data);
+
+	public function addFromMagnet($magnet);
+
+	public function addFromHash($hash);
+
+	public function addFromUrl($url);
+
+	public function addFromBase64($base64);
+	
+}
