@@ -8,3 +8,7 @@ Route::controller("/api/metadata/{hash?}", "$prefix\MetadataController");
 Route::controller("/", "$prefix\HomeController", array(
 	"getIndex" => "index"
 ));
+
+Route::post('queue/receive', function() {
+    return Queue::marshal();
+});

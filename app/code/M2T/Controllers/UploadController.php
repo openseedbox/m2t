@@ -9,6 +9,7 @@ class UploadController extends BaseController {
 	protected $torrents;
 
 	public function __construct(TorrentRepositoryInterface $torrents) {
+		parent::__construct();
 		$this->torrents = $torrents;
 	}
 
@@ -21,7 +22,7 @@ class UploadController extends BaseController {
 				return $this->success(array(
 					"data" => $data,
 					"added" => true,
-					"hash" => $torrent->getHash()
+					"hash" => $torrent->getInfoHash()
 				));
 			}
 			$error_message = "The supplied data wasnt recognised as a megnet link, url, hash or base64";

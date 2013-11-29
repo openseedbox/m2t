@@ -68,6 +68,8 @@ return array(
 	),
 	"unique"           => "The :attribute has already been taken.",
 	"url"              => "The :attribute format is invalid.",
+	"valid_hash" => "The hash is not valid.",
+	"hash_in_db" => "A matching hash could not be found in the database.",
 
 	/*
 	|--------------------------------------------------------------------------

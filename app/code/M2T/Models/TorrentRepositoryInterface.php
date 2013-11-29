@@ -4,7 +4,7 @@ namespace M2T\Models;
 
 interface TorrentRepositoryInterface {
 
-	public function getByHash($hash);
+	public function findByHash($hash);
 
 	public function add($data);
 
