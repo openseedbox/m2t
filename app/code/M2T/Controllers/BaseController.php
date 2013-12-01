@@ -2,11 +2,13 @@
 
 namespace M2T\Controllers;
 
-use \Controller, \Response, \App, \Exception;
+use \Controller, \Response, \App, \Exception, \Validator as ValidatorFacade;
 use Illuminate\Support\ArrayableInterface;
 use Illuminate\Validation\Validator;
 
 class BaseController extends Controller {
+
+	protected $torrents;
 
 	public function __construct() {
 		$self = $this;
@@ -18,6 +20,8 @@ class BaseController extends Controller {
 				});
 			});
 		}
+
+		$this->torrents = App::make("M2T\Models\TorrentRepositoryInterface");
 	}
 
 	public function success($data, $status = 200) {
@@ -45,5 +49,17 @@ class BaseController extends Controller {
 	public function missingMethod($params) {
 		return $this->error("No such method.");
 	}
+
+	protected function getTorrent($hash) {
+		return $this->torrents->findByHash($hash);
+	}
+
+	protected function getValidator($hash) {
+		return ValidatorFacade::make(array(
+				"hash" => $hash
+			), array(
+				"hash" => "required|valid_hash|hash_in_db"
+		));
+	}	
 
 }

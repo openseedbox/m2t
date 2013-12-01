@@ -38,7 +38,7 @@ return array(
 			'driver' => 'beanstalkd',
 			'host'   => '127.0.0.1',
 			"port" => 11300,
-			'queue'  => 'default'
+			'queue'  => 'm2t'
 		),
 
 		'sqs' => array(

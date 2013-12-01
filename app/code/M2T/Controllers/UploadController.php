@@ -2,16 +2,7 @@
 
 namespace M2T\Controllers;
 
-use M2T\Models\TorrentRepositoryInterface;
-
-class UploadController extends BaseController {
-
-	protected $torrents;
-
-	public function __construct(TorrentRepositoryInterface $torrents) {
-		parent::__construct();
-		$this->torrents = $torrents;
-	}
+class UploadController extends BaseController {	
 
 	public function getIndex($data = "") {
 		$data = trim($data);

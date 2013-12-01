@@ -3,6 +3,8 @@
 namespace M2T\Models\Eloquent;
 
 use M2T\Models\TorrentInterface;
+use M2T\Models\FileInterface;
+use M2T\Models\TrackerInterface;
 use \Eloquent, \DB;
 
 class Torrent extends Eloquent implements TorrentInterface {
@@ -38,6 +40,18 @@ class Torrent extends Eloquent implements TorrentInterface {
 
 	public function getBase64Metadata() {
 		return $this->base64_metadata;
+	}
+
+	public function setName($name) {
+		$this->name = $name;
+	}
+
+	public function setTotalSizeBytes($size) {
+		$this->total_size_bytes = $size;
+	}
+
+	public function setBase64Metadata($metadata) {
+		$this->base64_metadata = $metadata;
 	}
 
 	public function hasMetadata() {
@@ -77,16 +91,49 @@ class Torrent extends Eloquent implements TorrentInterface {
 		});
 	}
 
+	public function newFile() {
+		return new File();
+	}
+
+	public function addFile(FileInterface $file) {
+		File::create(array(
+			"name" => $file->getName(),
+			"full_location" => $file->getFullLocation(),
+			"length_bytes" => $file->getLengthBytes(),
+			"torrent_id" => $this->id
+		));
+	}
+
+	public function newTracker() {
+		return new Tracker();
+	}
+
+	public function addTracker(TrackerInterface $tracker) {
+		Tracker::create(array(
+			"tracker_url" => $tracker->getTrackerUrl(),
+			"seeds" => $tracker->getSeedCount(),
+			"leeches" => $tracker->getLeecherCount(),
+			"completed" => $tracker->getCompletedCount(),
+			"message" => $tracker->getMessage(),
+			"torrent_id" => $this->id
+		));
+	}
+
+	public function clearFiles() {
+		$files = $this->getFiles();
+		DB::transaction(function() use ($files) {
+			foreach ($files as $file) {
+				$file->delete();
+			}
+		});
+	}
+
 	public function toArray() {
 		$data = array(
 			"has_metadata" => $this->hasMetadata(),
 			"hash" => $this->getInfoHash(),
-			"name" => $this->getName(),
-			"from_magnet" => $this->isFromMagnet()
+			"name" => $this->getName()			
 		);
-		if ($this->isFromMagnet()) {
-			$data["magnet_uri"] = $this->getMagnetUri();
-		}
 		if (!$this->hasMetadata()) {
 			return $data;
 		}		

@@ -2,17 +2,25 @@
 
 namespace M2T\Jobs;
 
-use M2T\Models\TorrentRepositoryInterface;
+use Illuminate\Foundation\Artisan;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
-abstract class BaseJob {
+use \App;
 
-	public function __construct(TorrentRepositoryInterface $torrents) {
-		$this->torrents = $torrents;
-		$this->transmission = \App::make("transmission");
+class BaseJob {
+
+	protected function getInfoHash($data) {
+		return $data["hash"];
 	}
 
-	protected function getTorrent($data) {
-		return $this->torrents->findByHash($data["hash"]);
-	}
+	public function call($command, array $arguments = array()) {
+		$app = new Artisan(App::make("app"));//->getArtisan();
+		 $instance = $app->find($command);
+
+		 $arguments['command'] = $command;
+
+		 return $instance->run(new ArrayInput($arguments), new ConsoleOutput);
+	}	
 
 }

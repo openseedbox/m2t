@@ -14,4 +14,16 @@ interface TrackerInterface {
 
 	public function getCompletedCount();
 
+	public function getMessage();
+
+	public function setTrackerUrl($tracker_url);
+
+	public function setSeedCount($seed_count);
+
+	public function setLeecherCount($leecher_count);
+
+	public function setCompletedCount($completed_count);
+
+	public function setMessage($message);
+
 }

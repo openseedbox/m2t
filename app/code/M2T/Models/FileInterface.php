@@ -12,4 +12,10 @@ interface FileInterface {
 
 	public function getTorrent();
 
+	public function setName($name);
+
+	public function setFullLocation($location);
+
+	public function setLengthBytes($length);	
+
 }

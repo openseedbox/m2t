@@ -10,8 +10,7 @@
 		"openseedbox/torrent-rw": "dev-master"
 	},
 	"autoload": {
-		"classmap": [
-			"app/commands",
+		"classmap": [			
 			"app/database/migrations",
 			"app/database/seeds",
 			"app/tests/TestCase.php"

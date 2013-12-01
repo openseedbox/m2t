@@ -12,6 +12,12 @@ interface TorrentInterface {
 
 	public function getBase64Metadata();
 
+	public function setName($name);
+
+	public function setTotalSizeBytes($size);
+
+	public function setBase64Metadata($metadata);	
+
 	public function getCreateDate();
 
 	public function getTrackers();
@@ -25,5 +31,17 @@ interface TorrentInterface {
 	public function getMagnetUri();
 
 	public function isFromMagnet();
+
+	public function newFile();
+
+	public function addFile(FileInterface $file);
+
+	public function newTracker();
+
+	public function addTracker(TrackerInterface $tracker);
+
+	public function getFiles();
+
+	public function clearFiles();
 
 }

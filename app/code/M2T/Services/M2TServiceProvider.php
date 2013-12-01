@@ -11,8 +11,9 @@ class M2TServiceProvider extends ServiceProvider {
 
 	public function register() {
 		$this->registerModels();
+		$this->registerCommands();
 		$this->registerJobs();
-		$this->registerTransmission();
+		$this->registerTransmission();		
 	}
 
 	public function boot() {
@@ -39,6 +40,12 @@ class M2TServiceProvider extends ServiceProvider {
 		$this->app['transmission'] = $this->app->share(function($app) {
             return new Transmission($app['config']->get('transmission'));
         });
+	}
+
+	private function registerCommands() {
+		$this->app->bind("commands.add_torrent", "M2T\Commands\AddTorrent");
+		$this->app->bind("commands.check_torrent", "M2T\Commands\CheckTorrent");
+		$this->app->bind("commands.collect_stats", "M2T\Commands\CollectStats");
 	}
 
 }
