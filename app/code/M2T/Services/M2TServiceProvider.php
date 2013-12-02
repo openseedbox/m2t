@@ -12,8 +12,7 @@ class M2TServiceProvider extends ServiceProvider {
 	public function register() {
 		$this->registerModels();
 		$this->registerCommands();
-		$this->registerJobs();
-		$this->registerTransmission();		
+		$this->registerJobs();		
 	}
 
 	public function boot() {
@@ -34,12 +33,6 @@ class M2TServiceProvider extends ServiceProvider {
 		$this->app["validator"]->resolver(function($translator, $data, $rules, $messages) {
 			return new TorrentHashValidator($translator, $data, $rules, $messages);
 		});
-	}
-
-	private function registerTransmission() {
-		$this->app['transmission'] = $this->app->share(function($app) {
-            return new Transmission($app['config']->get('transmission'));
-        });
 	}
 
 	private function registerCommands() {

@@ -4,6 +4,7 @@ namespace M2T\Models\Eloquent;
 
 use M2T\Util\DataHandler;
 use M2T\Models\TorrentRepositoryInterface;
+use M2T\Models\Eloquent\Torrent as EloquentTorrent;
 
 use Openseedbox\Parser\Torrent as TorrentParser;
 use Openseedbox\Parser\Magnet as MagnetParser;
@@ -16,35 +17,15 @@ class TorrentRepository implements TorrentRepositoryInterface {
 
 	private $handler;
 
-	public function __construct(DataHandler $handler, MagnetParser $magnet_parser, TorrentParser $torrent_parser, HttpClient $client) {
+	public function __construct(DataHandler $handler, MagnetParser $magnet_parser, TorrentParser $torrent_parser, HttpClient $client, EloquentTorrent $torrent) {
 		$this->handler = $handler;
 		$this->magnet_parser = $magnet_parser;
 		$this->torrent_parser = $torrent_parser;
+		$this->torrent = $torrent;
 	}
 
 	public function findByHash($hash) {
-		return Torrent::where("hash", $hash)->limit(1)->first();
-	}
-
-	public function addFromHash($hash) {
-		return $this->addFromMagnet($this->magnet_parser->create($hash));
-	}
-
-	public function addFromMagnet($magnet) {
-		$magnet = $this->magnet_parser->parse($magnet);
-		return $this->createFromParsed($magnet);
-	}
-
-	public function addFromUrl($url) {
-		$response = $client->get($url)->send();
-		echo("got response");
-		dd($response);
-	}
-
-	public function addFromBase64($base64) {
-		$file = base64_decode($base64);
-		$torrent = $this->torrent_parser->parseFromContents($file);
-		return $this->createFromParsed($torrent);
+		return $this->torrent->where("hash", $hash)->limit(1)->first();
 	}
 
 	public function add($data) {
@@ -61,6 +42,31 @@ class TorrentRepository implements TorrentRepositoryInterface {
 			return $this->addFromBase64($data);
 		}
 		return null;
+	}
+
+	public function all() {
+		return $this->torrent->all();
+	}	
+
+	private function addFromHash($hash) {
+		return $this->addFromMagnet($this->magnet_parser->create($hash));
+	}
+
+	private function addFromMagnet($magnet) {
+		$magnet = $this->magnet_parser->parse($magnet);
+		return $this->createFromParsed($magnet);
+	}
+
+	private function addFromUrl($url) {
+		$response = $client->get($url)->send();
+		echo("got response");
+		dd($response);
+	}
+
+	private function addFromBase64($base64) {
+		$file = base64_decode($base64);
+		$torrent = $this->torrent_parser->parseFromContents($file);
+		return $this->createFromParsed($torrent);
 	}
 
 	private function createFromParsed(TorrentParserInterface $torrent) {
@@ -80,7 +86,7 @@ class TorrentRepository implements TorrentRepositoryInterface {
 		if ($ret) {
 			$ret->update($data);
 		} else {
-			$ret = Torrent::create($data);
+			$ret = $this->torrent->create($data);
 		}
 
 		$ret->clearTrackers();
@@ -99,9 +105,10 @@ class TorrentRepository implements TorrentRepositoryInterface {
 		}
 
 		//queue a job to get the metadata if required
+		/*
 		if (!$ret->in_transmission) {			
 			Queue::push("jobs.add_torrent", array("hash" => $ret->getInfoHash()));
-		}
+		}*/
 
 		return $ret;
 	}

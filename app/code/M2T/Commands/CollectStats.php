@@ -2,6 +2,11 @@
 
 namespace M2T\Commands;
 
+use M2T\Models\TorrentInterface;
+use Symfony\Component\Console\Input\InputArgument;
+
+use \DB;
+
 class CollectStats extends BaseCommand {
 	
 	protected $name = 'm2t:stats';
@@ -9,25 +14,31 @@ class CollectStats extends BaseCommand {
 	protected $description = 'Loops over all the known torrents and grabs their seeder/leecher/complete stats';
 
 	public function fire() {
-		$torrents = $this->transmission->get("all", array("hashString", "trackerStats"));		
-		foreach ($torrents["torrents"] as $torrent) {
-			$db = $this->torrents->findByHash($torrent["hashString"]);
-			if ($db) {
-				$db->clearTrackers();
-				foreach ($torrent["trackerStats"] as $tracker) {
-					$db->addTracker($this->createTracker($db, $tracker));
+		$hash = $this->argument("hash");
+		$self = $this;
+		if ($hash && $torrent = $this->getTorrent()) {
+			$this->updateTrackersFor($torrent);
+		} else {
+			$torrents = $this->torrents->all();
+			DB::transaction(function() use ($torrents, $self) {
+				foreach ($torrents as $torrent) {
+					$self->updateTrackersFor($torrent);
 				}
-				$db->save();
-				$this->info("Torrent {$torrent['hashString']} stats updated.");
-			} else {
-				$this->error("Torrent {$torrent['hashString']} is in transmission but not in the database! Removing from transmission.");
-				$this->transmission->remove($torrent["hashString"], true);
-			}
+			});
+			$this->info("All stats updated.");
 		}
 	}
 
 	public function getArguments() {
-		return array();
+		return array(
+			array('hash', InputArgument::OPTIONAL, 'The torrent info_hash. If omitted, all torrents will have their stats updated.'),
+		);
+	}
+
+	private function updateTrackersFor(TorrentInterface $torrent) {
+		$this->transmission->getTrackerStats($torrent);
+		$torrent->save();
+		$this->info("Updated tracker stats for: {$torrent->getInfoHash()}");
 	}
 	
 }

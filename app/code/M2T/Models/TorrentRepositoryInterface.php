@@ -8,12 +8,6 @@ interface TorrentRepositoryInterface {
 
 	public function add($data);
 
-	public function addFromMagnet($magnet);
-
-	public function addFromHash($hash);
-
-	public function addFromUrl($url);
-
-	public function addFromBase64($base64);
+	public function all();
 	
 }

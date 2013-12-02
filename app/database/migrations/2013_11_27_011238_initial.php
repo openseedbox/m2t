@@ -13,8 +13,7 @@ class Initial extends Migration {
 			$table->string("name", 300);
 			$table->integer("total_size_bytes")->unsigned()->default(0);
 			$table->longtext("base64_metadata")->nullable();
-			$table->string("magnet_uri", 1000)->nullable();
-			$table->boolean("in_transmission")->default(false);
+			$table->string("magnet_uri", 1000)->nullable();			
 
 			$table->unique("hash");
 		});

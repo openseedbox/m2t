@@ -92,7 +92,9 @@ class Torrent extends Eloquent implements TorrentInterface {
 	}
 
 	public function newFile() {
-		return new File();
+		return new File(array(
+			"torrent_id" => $this->id
+		));
 	}
 
 	public function addFile(FileInterface $file) {

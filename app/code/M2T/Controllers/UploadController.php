@@ -16,9 +16,9 @@ class UploadController extends BaseController {
 					"hash" => $torrent->getInfoHash()
 				));
 			}
-			$error_message = "The supplied data wasnt recognised as a megnet link, url, hash or base64";
+			$error_message = "The supplied data wasnt recognised as a magnet link, url, hash or base64";
 		}
-		return $this->error($error_message);
+		return $this->error($error_message, array("data" => $data));
 	}
 
 }
