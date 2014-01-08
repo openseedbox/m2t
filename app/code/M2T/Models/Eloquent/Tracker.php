@@ -28,15 +28,15 @@ class Tracker extends Eloquent implements TrackerInterface {
 	}
 
 	public function getSeedCount() {
-		return $this->seeds;
+		return $this->seeds ?: 0;
 	}
 
 	public function getLeecherCount() {
-		return $this->leechers;
+		return $this->leechers ?: 0;
 	}
 
 	public function getCompletedCount() {
-		return $this->completed;
+		return $this->completed ?: 0;
 	}
 
 	public function getMessage() {

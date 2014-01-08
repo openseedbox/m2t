@@ -4,6 +4,7 @@ namespace M2T\Models\Eloquent;
 
 use M2T\Util\DataHandler;
 use M2T\Models\TorrentRepositoryInterface;
+use M2T\Models\TorrentInterface;
 use M2T\Models\Eloquent\Torrent as EloquentTorrent;
 
 use Openseedbox\Parser\Torrent as TorrentParser;
@@ -17,17 +18,23 @@ class TorrentRepository implements TorrentRepositoryInterface {
 
 	private $handler;
 
-	public function __construct(DataHandler $handler, MagnetParser $magnet_parser, TorrentParser $torrent_parser, HttpClient $client, EloquentTorrent $torrent) {
+	public function __construct(DataHandler $handler, MagnetParser $magnet_parser, TorrentParser $torrent_parser, HttpClient $client) {
 		$this->handler = $handler;
 		$this->magnet_parser = $magnet_parser;
 		$this->torrent_parser = $torrent_parser;
-		$this->torrent = $torrent;
+		$this->client = $client;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function findByHash($hash) {
-		return $this->torrent->where("hash", $hash)->limit(1)->first();
+		return EloquentTorrent::where("hash", $hash)->limit(1)->first();
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function add($data) {
 		if ($this->handler->isHash($data)) {
 			return $this->addFromHash($data);
@@ -44,9 +51,19 @@ class TorrentRepository implements TorrentRepositoryInterface {
 		return null;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function all() {
-		return $this->torrent->all();
-	}	
+		return EloquentTorrent::all();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getRecent($limit = 10) {
+		return $this->torrents->orderBy("created_at", "DESC")->take($limit)->get();
+	}
 
 	private function addFromHash($hash) {
 		return $this->addFromMagnet($this->magnet_parser->create($hash));
@@ -58,18 +75,30 @@ class TorrentRepository implements TorrentRepositoryInterface {
 	}
 
 	private function addFromUrl($url) {
-		$response = $client->get($url)->send();
-		echo("got response");
-		dd($response);
+		$response = $this->client->get($url)->send();
+		$data = $response->getBody(true);
+		return $this->createFromParsed($this->torrent_parser->parse($data));
 	}
 
 	private function addFromBase64($base64) {
 		$file = base64_decode($base64);
-		$torrent = $this->torrent_parser->parseFromContents($file);
+		$torrent = $this->torrent_parser->parse($file);
 		return $this->createFromParsed($torrent);
 	}
 
 	private function createFromParsed(TorrentParserInterface $torrent) {
+		$data = $this->getDataArray($torrent);
+
+		$ret = $this->createOrUpdate($data);
+
+		$this->addTrackersIfPresent($torrent, $ret);
+
+		$this->queueAddToBackend($ret);
+		
+		return $ret;
+	}
+
+	private function getDataArray(TorrentParserInterface $torrent) {
 		$data = array(
 			"name" => $torrent->getName(),
 			"hash" => $torrent->getInfoHash()			
@@ -82,35 +111,42 @@ class TorrentRepository implements TorrentRepositoryInterface {
 			$data["total_size_bytes"] = $torrent->getTotalSizeBytes();
 		}
 
-		$ret = $this->findByHash($torrent->getInfoHash());
+		return $data;
+	}
+
+	private function createOrUpdate(array $data) {
+		$ret = $this->findByHash($data["hash"]);
 		if ($ret) {
 			$ret->update($data);
 		} else {
-			$ret = $this->torrent->create($data);
+			$ret = EloquentTorrent::create($data);
 		}
+		return $ret;
+	}
 
+	private function addTrackersIfPresent(TorrentParserInterface $torrent, TorrentInterface $ret) {
 		$ret->clearTrackers();
 
 		$trackers = $torrent->getTrackerUrls();
 		if (count($trackers) > 0) {
-
 			DB::transaction(function() use ($trackers, $ret) {
 				foreach ($trackers as $tracker_url) {
-					Tracker::create(array(
-						"torrent_id" => $ret->id,
-						"tracker_url" => $tracker_url
-					));
+					$tracker = $ret->newTracker();
+					$tracker->setTrackerUrl($tracker_url);
+					$ret->addTracker($tracker);					
 				}
 			});
 		}
 
+		return $ret;
+	}
+
+	private function queueAddToBackend(TorrentInterface $ret) {
 		//queue a job to get the metadata if required
 		/*
 		if (!$ret->in_transmission) {			
 			Queue::push("jobs.add_torrent", array("hash" => $ret->getInfoHash()));
 		}*/
-
-		return $ret;
 	}
 
 }
