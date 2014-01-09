@@ -107,7 +107,7 @@ class TorrentRepository implements TorrentRepositoryInterface {
 		if ($torrent->isFromMagnet()) {
 			$data["magnet_uri"] = $torrent->getMagnetUri();
 		} else {
-			$data["base64_metadata"] = $torrent->getMetadataBase64();
+			$data["base64_metadata"] = $torrent->getBase64Metadata();
 			$data["total_size_bytes"] = $torrent->getTotalSizeBytes();
 		}
 

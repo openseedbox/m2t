@@ -66,6 +66,12 @@ class Torrent extends Eloquent implements TorrentInterface {
 		return $this->trackers()->get();
 	}
 
+	public function getTrackerUrls() {
+		return $this->trackers()->get()->map(function($tracker) {
+			return $tracker->getTrackerUrl();
+		})->toArray();
+	}
+
 	public function getFiles() {
 		return $this->files()->get();
 	}

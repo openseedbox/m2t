@@ -46,7 +46,7 @@ class BaseController extends Controller {
 		return Response::json($data, $status);
 	}
 
-	public function missingMethod($params) {
+	public function missingMethod($params = array()) {
 		return $this->error("No such method.");
 	}
 

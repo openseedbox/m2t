@@ -35,7 +35,16 @@ class TorrentRepositoryTest extends TestCase {
 		$this->repo = $this->getRepo();
 
 		$torrent = $this->repo->add($url);
-		dd($torrent);
+		$this->assertNotNull($torrent);
+		$this->assertInstanceOf("M2T\Models\TorrentInterface", $torrent);
+		$this->assertEquals("91c1c0ad9fba72d28a4e91e5ed42e9fae0c03781", $torrent->getInfoHash());
+		$this->assertEquals(10059226, $torrent->getTotalSizeBytes());
+		$this->assertEquals($this->getBase64Metadata(), $torrent->getBase64Metadata());
+		$this->assertEquals("Avicii - Wake Me Up.mp3", $torrent->getName());
+		$this->assertCount(5, $torrent->getTrackerUrls());
+		$this->assertEquals("udp://tracker.openbittorrent.com:80", $torrent->getTrackerUrls()[0]);
+		$this->assertCount(5, $torrent->getTrackers());
+		$this->assertEquals("udp://tracker.openbittorrent.com:80", $torrent->getTrackers()->first()->getTrackerUrl());
 	}
 
 	public function testCanAddBase64() {

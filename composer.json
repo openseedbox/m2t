@@ -4,7 +4,7 @@
 	"keywords": ["framework", "laravel"],
 	"license": "MIT",
 	"require": {
-		"laravel/framework": "4.0.*",
+		"laravel/framework": "4.1.*",
 		"vohof/transmission": "1.0.*",
 		"pda/pheanstalk": "2.1.*",
 		"openseedbox/torrent-rw": "dev-master"
@@ -36,12 +36,13 @@
 			"php artisan key:generate"
 		]
 	},
+	"repositories" : [{
+		"url" : "https://github.com/openseedbox/torrent-rw.git",
+		"type" : "git"
+	}],
 	"config": {
 		"preferred-install": "dist"
 	},
-	"repositories" : [
-		{ "type" : "git", "url" : "../torrent-rw" }
-	],
 	"minimum-stability": "dev",
 	"prefer-stable" : true
 }

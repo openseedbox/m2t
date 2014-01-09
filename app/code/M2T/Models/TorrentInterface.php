@@ -2,15 +2,9 @@
 
 namespace M2T\Models;
 
-interface TorrentInterface {
+use Openseedbox\Parser\TorrentInterface as ParserTorrentInterface;
 
-	public function getInfoHash();
-
-	public function getName();
-
-	public function getTotalSizeBytes();
-
-	public function getBase64Metadata();
+interface TorrentInterface extends ParserTorrentInterface {
 
 	public function setName($name);
 
@@ -27,10 +21,6 @@ interface TorrentInterface {
 	public function hasMetadata();
 
 	public function getDownloadLink();
-
-	public function getMagnetUri();
-
-	public function isFromMagnet();
 
 	public function newFile();
 
