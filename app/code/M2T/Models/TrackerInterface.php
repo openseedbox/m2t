@@ -2,7 +2,9 @@
 
 namespace M2T\Models;
 
-interface TrackerInterface {
+use Illuminate\Support\Contracts\ArrayableInterface;
+
+interface TrackerInterface extends ArrayableInterface {
 
 	public function getTorrent();
 

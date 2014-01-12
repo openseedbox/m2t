@@ -5,20 +5,23 @@ namespace M2T\Models\Eloquent;
 use M2T\Models\TorrentInterface;
 use M2T\Models\FileInterface;
 use M2T\Models\TrackerInterface;
+use M2T\Models\Traits\TorrentTrait;
 use \Eloquent, \DB;
 
 class Torrent extends Eloquent implements TorrentInterface {
+
+	use TorrentTrait;
 
 	protected $table = "torrents";
 
 	protected $fillable = array("hash", "name", "total_size_bytes", "base64_metadata", "magnet_uri");
 	protected $hidden = array("in_transmission", "updated_at");
 
-	public function files() {
+	protected function files() {
 		return $this->hasMany(get_class(new File()));
 	}
 
-	public function trackers() {
+	protected function trackers() {
 		return $this->hasMany(get_class(new Tracker()));
 	}
 
@@ -40,6 +43,10 @@ class Torrent extends Eloquent implements TorrentInterface {
 
 	public function getBase64Metadata() {
 		return $this->base64_metadata;
+	}
+
+	public function setInfoHash($hash) {
+		$this->hash = $hash;
 	}
 
 	public function setName($name) {
@@ -74,10 +81,6 @@ class Torrent extends Eloquent implements TorrentInterface {
 
 	public function getFiles() {
 		return $this->files()->get();
-	}
-
-	public function getDownloadLink() {
-		return "to implement";
 	}
 
 	public function getMagnetUri() {
@@ -134,23 +137,6 @@ class Torrent extends Eloquent implements TorrentInterface {
 				$file->delete();
 			}
 		});
-	}
-
-	public function toArray() {
-		$data = array(
-			"has_metadata" => $this->hasMetadata(),
-			"hash" => $this->getInfoHash(),
-			"name" => $this->getName()			
-		);
-		if (!$this->hasMetadata()) {
-			return $data;
-		}		
-		return array_merge($data, array(						
-			"download_link" => $this->getDownloadLink(),
-			"total_size_bytes" => $this->getTotalSizeBytes(),
-			"files" => $this->getFiles()->toArray(),
-			"trackers" => $this->getTrackers()->toArray()
-		));
-	}
+	}	
 
 }

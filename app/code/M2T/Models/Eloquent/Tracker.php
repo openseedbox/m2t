@@ -3,9 +3,12 @@
 namespace M2T\Models\Eloquent;
 
 use M2T\Models\TrackerInterface;
+use M2T\Models\Traits\TrackerTrait;
 use \Eloquent;
 
 class Tracker extends Eloquent implements TrackerInterface {
+
+	use TrackerTrait;
 
 	protected $table = "trackers";
 
@@ -15,7 +18,7 @@ class Tracker extends Eloquent implements TrackerInterface {
 
 	public $timestamps = false;
 
-	public function torrent() {
+	protected function torrent() {
 		return $this->belongsTo(get_class("Torrent"));
 	}
 

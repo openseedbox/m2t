@@ -3,9 +3,12 @@
 namespace M2T\Models\Eloquent;
 
 use M2T\Models\FileInterface;
+use M2T\Models\Traits\FileTrait;
 use \Eloquent;
 
 class File extends Eloquent implements FileInterface {
+
+	use FileTrait;
 
 	protected $table = "files";
 
@@ -15,7 +18,7 @@ class File extends Eloquent implements FileInterface {
 
 	public $timestamps = false;
 
-	public function torrent() {
+	protected function torrent() {
 		return $this->belongsTo(get_class(new Torrent()));
 	}
 

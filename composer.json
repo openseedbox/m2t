@@ -39,6 +39,9 @@
 	"repositories" : [{
 		"url" : "https://github.com/openseedbox/torrent-rw.git",
 		"type" : "git"
+	}, {
+		"type" : "git",
+		"url" : "https://github.com/erindru/laravel-bencode.git"
 	}],
 	"config": {
 		"preferred-install": "dist"

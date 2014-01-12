@@ -48,20 +48,77 @@ class TorrentRepositoryTest extends TestCase {
 	}
 
 	public function testCanAddBase64() {
-		$metadata = $this->getBase64Metadata();		
-		
+		$metadata = $this->getBase64Metadata();
+
+		$torrent = $this->repo->add($metadata);	
+		$this->assertNotNull($torrent);
+		$this->assertInstanceOf("M2T\Models\TorrentInterface", $torrent);
+		$this->assertEquals("91c1c0ad9fba72d28a4e91e5ed42e9fae0c03781", $torrent->getInfoHash());
+		$this->assertEquals(10059226, $torrent->getTotalSizeBytes());
+		$this->assertEquals($this->getBase64Metadata(), $torrent->getBase64Metadata());
+		$this->assertEquals("Avicii - Wake Me Up.mp3", $torrent->getName());
+		$this->assertCount(5, $torrent->getTrackerUrls());
+		$this->assertEquals("udp://tracker.openbittorrent.com:80", $torrent->getTrackerUrls()[0]);
+		$this->assertCount(5, $torrent->getTrackers());
+		$this->assertEquals("udp://tracker.openbittorrent.com:80", $torrent->getTrackers()->first()->getTrackerUrl());		
 	}
 
 	public function testCanAddHash() {
+		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
 
+		$torrent = $this->repo->add($hash);
+		$this->assertNotNull($torrent);
+		$this->assertInstanceOf("M2T\Models\TorrentInterface", $torrent);
+		$this->assertEquals($hash, $torrent->getInfoHash());
+		$this->assertEquals($hash, $torrent->getName());
 	}
 
 	public function testFindByHash() {
+		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
+		$this->repo->add($hash);
 
+		$found = $this->repo->findByHash($hash);
+		$this->assertNotNull($found);
+		$this->assertInstanceOf("M2T\Models\TorrentInterface", $found);
 	}
 
 	public function testAll() {
+		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
+		$hash1 = "07a9de9750158471c3302e4e95edb1107f980fa7";
+		$hash2 = "07a9de9750158471c3302e4e95edb1107f980fa8";
 
+		$this->repo->add($hash);
+		$this->repo->add($hash1);
+		$this->repo->add($hash2);
+
+		$all = $this->repo->all();
+
+		$this->assertNotNull($all);
+		$this->assertCount(3, $all);
+	}
+
+	public function testGetRecent() {
+
+		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
+		$hash1 = "07a9de9750158471c3302e4e95edb1107f980fa7";
+		$hash2 = "07a9de9750158471c3302e4e95edb1107f980fa8";
+
+		$this->repo->add($hash);
+		$this->repo->add($hash1);
+		$this->repo->add($hash2);
+
+		$recent = $this->repo->getRecent(2);
+
+		$this->assertCount(2, $recent);
+	}
+
+	public function testAddingHashesTwiceDoesntCreateTwoRecords() {
+		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
+
+		$this->repo->add($hash);
+		$this->repo->add($hash);
+
+		$this->assertCount(1, $this->repo->all());
 	}
 
 	private function mockHttpClient(array $data) {

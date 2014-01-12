@@ -3,8 +3,11 @@
 namespace M2T\Models;
 
 use Openseedbox\Parser\TorrentInterface as ParserTorrentInterface;
+use Illuminate\Support\Contracts\ArrayableInterface;
 
-interface TorrentInterface extends ParserTorrentInterface {
+interface TorrentInterface extends ParserTorrentInterface, ArrayableInterface {
+
+	public function setInfoHash($hash);
 
 	public function setName($name);
 
@@ -18,9 +21,7 @@ interface TorrentInterface extends ParserTorrentInterface {
 
 	public function clearTrackers();
 
-	public function hasMetadata();
-
-	public function getDownloadLink();
+	public function hasMetadata();	
 
 	public function newFile();
 

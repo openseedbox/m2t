@@ -15,11 +15,11 @@ class InfoController extends BaseController {
 		if (!$torrent) {
 			return $this->errorInvalidHash($hash);
 		}
-		return $this->success($torrent->toArray());
+		return $this->success(array("torrent" => $torrent->toArray()));
 	}
 
 	public function getRecent() {
-		return $this->success($torrent->getRecent(10)->toArray());
+		return $this->success(array("torrents" => $this->torrents->getRecent(10)->toArray()));
 	}
 
 	private function errorInvalidHash($hash) {

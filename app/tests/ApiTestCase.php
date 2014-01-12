@@ -8,6 +8,10 @@ class ApiTestCase extends TestCase {
 		return $this->json_response;
 	}
 
+	protected function assertResponseSuccess() {
+		$this->assertTrue($this->json_response["success"]);
+	}
+
 	protected function assertResponseError($status = 400) {
 		$this->assertResponseStatus($status);
 		$this->assertFalse($this->json_response["success"]);

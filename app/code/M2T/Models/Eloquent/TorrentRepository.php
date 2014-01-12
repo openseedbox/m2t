@@ -62,7 +62,7 @@ class TorrentRepository implements TorrentRepositoryInterface {
 	 * @inheritdoc
 	 */
 	public function getRecent($limit = 10) {
-		return $this->torrents->orderBy("created_at", "DESC")->take($limit)->get();
+		return EloquentTorrent::orderBy("created_at", "DESC")->take($limit)->get();
 	}
 
 	private function addFromHash($hash) {

@@ -2,7 +2,9 @@
 
 namespace M2T\Models;
 
-interface FileInterface {
+use Illuminate\Support\Contracts\ArrayableInterface;
+
+interface FileInterface extends ArrayableInterface {
 
 	public function getName();
 
