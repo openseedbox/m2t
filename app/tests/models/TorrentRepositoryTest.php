@@ -121,6 +121,23 @@ class TorrentRepositoryTest extends TestCase {
 		$this->assertCount(1, $this->repo->all());
 	}
 
+	public function testHashDoesntOverwriteExistingFilename() {
+		$hash = "91c1c0ad9fba72d28a4e91e5ed42e9fae0c03781";
+		$filename = "Avicii - Wake Me Up.mp3";
+
+		$torrent = $this->repo->add($this->getBase64Metadata());
+
+		$this->assertEquals($filename, $torrent->getName());
+		$this->assertEquals($hash, $torrent->getInfoHash());
+
+		$this->repo->add($hash);
+
+		$torrent = $this->repo->findByHash($hash);
+
+		$this->assertNotEquals($hash, $torrent->getName());
+		$this->assertEquals($filename, $torrent->getName());		
+	}
+
 	private function mockHttpClient(array $data) {
 		$plugin = new MockPlugin();
 		foreach ($data as $url => $value) {

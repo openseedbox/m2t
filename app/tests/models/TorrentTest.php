@@ -47,6 +47,7 @@ class TorrentTest extends PHPUnit_Framework_TestCase {
 			"name" => "Test",
 			"download-link" => "http://localhost/api/metadata/07a9de9750158471c3302e4e95edb1107f980fa6.torrent",
 			"total-size-bytes" => 400,
+			"total-size-human" => "400 bytes",
 			"files" => array(),
 			"trackers" => array()
 		), $a);

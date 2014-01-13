@@ -137,6 +137,13 @@ class Torrent extends Eloquent implements TorrentInterface {
 				$file->delete();
 			}
 		});
+	}
+
+	public function update(array $data = array()) {
+		if ($data["hash"] == @$data["name"]) {
+			unset($data["name"]);
+		}
+		return parent::update($data);
 	}	
 
 }

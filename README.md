@@ -9,7 +9,7 @@ This is an API that allows a magnet link, torrent URL, torrent file or torrent i
 It gets this data by loading the torrent into an implemented backend. Currently the only implemented backend is transmission-daemon, but it requires [this patch](https://trac.transmissionbt.com/ticket/5547) to work.
 
 ## Requirements
-	- PHP 5.4+
-	- MySQL 5.5+
-	- transmission-daemon 2.80+ with [this patch](https://trac.transmissionbt.com/ticket/5547) applied
+- PHP 5.4+
+- MySQL 5.5+
+- transmission-daemon 2.80+ with [this patch](https://trac.transmissionbt.com/ticket/5547) applied
 

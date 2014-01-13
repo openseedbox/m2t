@@ -3,6 +3,7 @@
 namespace M2T\Models\Traits;
 
 use \URL;
+use M2T\Util\ByteFormatter;
 
 trait TorrentTrait {
 
@@ -10,7 +11,8 @@ trait TorrentTrait {
 		return URL::route("metadata.hash", array("hash" => $this->getInfoHash()));
 	}
 
-	public function toArray() {		
+	public function toArray() {
+		$formatter = new ByteFormatter();
 		$data = array(
 			"has-metadata" => $this->hasMetadata(),
 			"hash" => $this->getInfoHash(),
@@ -22,6 +24,7 @@ trait TorrentTrait {
 		return array_merge($data, array(						
 			"download-link" => $this->getDownloadLink(),
 			"total-size-bytes" => $this->getTotalSizeBytes(),
+			"total-size-human" => $formatter->format($this->getTotalSizeBytes()),
 			"files" => $this->getFiles()->toArray(),
 			"trackers" => $this->getTrackers()->toArray()
 		));

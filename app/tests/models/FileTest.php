@@ -15,7 +15,8 @@ class FileTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(
 			"name" => "test.php",
 			"full-location" => "files/test.php",
-			"length-bytes" => 400
+			"length-bytes" => 400,
+			"length-human" => "400 bytes"
 		), $file->toArray());
 	}
 

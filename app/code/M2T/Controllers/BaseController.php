@@ -21,7 +21,7 @@ class BaseController extends Controller {
 			});
 		}
 
-		$this->torrents = App::make("M2T\Models\TorrentRepositoryInterface");
+		$this->torrents = App::make("M2T\Models\TorrentRepositoryInterface");		
 	}
 
 	public function success($data, $status = 200) {
