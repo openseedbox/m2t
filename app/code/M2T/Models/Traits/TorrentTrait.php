@@ -2,10 +2,12 @@
 
 namespace M2T\Models\Traits;
 
+use \URL;
+
 trait TorrentTrait {
 
 	public function getDownloadLink() {
-		return "to implement";
+		return URL::route("metadata.hash", array("hash" => $this->getInfoHash()));
 	}
 
 	public function toArray() {		

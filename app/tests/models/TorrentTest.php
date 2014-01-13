@@ -45,12 +45,23 @@ class TorrentTest extends PHPUnit_Framework_TestCase {
 			"hash" => $hash,
 			"has-metadata" => true,
 			"name" => "Test",
-			"download-link" => "to implement",
+			"download-link" => "http://localhost/api/metadata/07a9de9750158471c3302e4e95edb1107f980fa6.torrent",
 			"total-size-bytes" => 400,
 			"files" => array(),
 			"trackers" => array()
 		), $a);
 
+	}
+
+	public function testGetDownloadLink() {
+		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
+		$torrent = new Torrent();
+		$torrent->setInfoHash($hash);
+		
+		$link = $torrent->getDownloadLink();
+		$this->assertNotNull($link);
+		$this->assertContains("$hash.torrent", $link);
+		$this->assertContains("http://", $link);
 	}
 	
 }
