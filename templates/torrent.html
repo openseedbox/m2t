@@ -1,0 +1,49 @@
+<h2>Info for {{ hash }}</h2>
+<div>
+	<table class="table table-condensed">
+		<tr>
+			<td><strong>Name:</strong> {{ info.name }}</td>
+		</tr>
+		<tr ng-show="info['total-size-bytes']">
+			<td><strong>Size:</strong> {{ info["total-size-human"] }}</td>
+		</tr>
+		<tr>
+			<td><strong>Download Link:</strong> <a target="_blank" href="{{ info['download-link'] }}"> {{ info.hash }}</a></td>			
+		</tr>		
+	</table>
+	<div ng-hide="info['has-metadata']">
+		<p>Metadata still downloading. <a ng-href="#" ng-click="refresh($event)">Refresh</a></p>
+	</div>
+	<div ng-show="info['has-metadata']">
+		<h2>Files</h2>
+		<table class="table table-condensed">
+			<tr>
+				<th>Path</th>
+				<th>Size</th>
+			</tr>
+			<tr ng-repeat="file in info.files">
+				<td>{{ file['full-location'] }}</td>
+				<td>{{ file['length-human'] }}</td>
+			</tr>
+		</table>
+		<h2>Trackers</h2>
+		<table class="table table-condensed">
+			<tr>
+				<th>URL</th>
+				<th>Seeds</th>
+				<th>Peers</th>
+				<th>Complete</th>
+				<th>Status</th>
+			</tr>
+			<tr ng-repeat="tracker in info.trackers">
+				<td>{{ tracker.url }}</td>
+				<td>{{ tracker.seeds }}</td>
+				<td>{{ tracker.leechers }}</td>
+				<td>{{ tracker.complete }}</td>
+				<td>{{ tracker.message }}</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<a class="btn btn-primary pull-right" href="#/">Back</a>
+<div class="clearfix"></div>

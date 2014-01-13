@@ -1,0 +1,42 @@
+<div>
+	<div ng-show="error" class="alert alert-danger">				
+		<a class="close pull-right" data-dismiss="alert" ng-click="clearErrors()" href="#">&times;</a>
+		<p ng-bind-html="error"></p>
+	</div>
+	<p>
+		Paste magnet links or torrent URLs below (separated by newlines if you want multiple) and then click "Lookup".
+	</p>
+	<div class="form-group">
+		<label>Magnets or URLs</label>
+		<textarea rows="5" class="form-control" ng-model="urls"></textarea>
+		<a class="btn btn-primary pull-right" style="margin-top: 10px" ng-click="submitUrls()">Submit</a>
+	</div>
+	<div class="clearfix"></div>
+	<div ng-show="added_hashes.length">
+		<h2>Added Torrents</h2>
+		<ul class="added-hashes">
+			<li ng-repeat="hash in added_hashes">
+				<a ng-href="#/{{ hash }}">{{ hash }}</a>
+			</li>
+		</ul>
+	</div>
+	<div ng-if="recent.length">
+		<h2>Recent Torrents</h2>
+		<table class="table table-condensed">
+			<tr>
+				<th>Hash</th>
+				<th>Name</th>
+				<th>Size</th>
+				<th>Action</th>
+			</tr>
+			<tr ng-repeat="torrent in recent">
+				<td>{{ torrent.hash }}</td>
+				<td>{{ torrent.name }}</td>
+				<td>{{ torrent['total-size-human'] }}<span class="text-danger" ng-hide="torrent['total-size-human']">N/A</span></td>
+				<td>
+					<a href="#/{{ torrent.hash }}">Info</a>				
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
