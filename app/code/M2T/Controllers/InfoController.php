@@ -22,6 +22,10 @@ class InfoController extends BaseController {
 		return $this->success(array("torrents" => $this->torrents->getRecent(10)->toArray()));
 	}
 
+	public function getRefresh($hash) {
+		\Artisan::call("m2t:check", array("hash" => $hash));
+	}
+
 	private function errorInvalidHash($hash) {
 		return $this->error("Hash empty or invalid: $hash");
 	}

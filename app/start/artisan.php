@@ -14,4 +14,5 @@
 Artisan::resolve("commands.add_torrent");
 Artisan::resolve("commands.check_torrent");
 Artisan::resolve("commands.collect_stats");
+Artisan::resolve("commands.queue_collect_stats");
 

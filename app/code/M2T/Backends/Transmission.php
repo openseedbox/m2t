@@ -30,7 +30,8 @@ class Transmission implements BackendInterface {
 	public function isMetainfoComplete(TorrentInterface $torrent) {
 		$response = $this->transmission->get($torrent->getInfoHash(), array("metadataPercentComplete"));
 		if (!$this->torrentPresentIn($response)) {
-			$this->addTorrent($torent);
+			$this->addTorrent($torrent);
+			return $this->isMetainfoComplete($torrent);
 		}
 		$complete = $response["torrents"][0]["metadataPercentComplete"];
 		if ($complete == 1) {

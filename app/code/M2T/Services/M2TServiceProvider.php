@@ -39,6 +39,7 @@ class M2TServiceProvider extends ServiceProvider {
 		$this->app->bind("commands.add_torrent", "M2T\Commands\AddTorrent");
 		$this->app->bind("commands.check_torrent", "M2T\Commands\CheckTorrent");
 		$this->app->bind("commands.collect_stats", "M2T\Commands\CollectStats");
+		$this->app->bind("commands.queue_collect_stats", "M2T\Commands\QueueCollectStats");
 	}
 
 }
