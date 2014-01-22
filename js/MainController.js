@@ -1,11 +1,17 @@
 (function() {
-	angular.module("m2t").controller("MainController", ["$scope", "$http", "API_BASE", function($scope, $http, API_BASE) {		
+	angular.module("m2t").controller("MainController",
+		["$scope", "$http", "API_BASE", "$rootScope",
+			function($scope, $http, API_BASE, $rootScope) {
+
+		$rootScope.require_css = ["main.css"];
 
 		$scope.error = "";
 		$scope.added_hashes = [];
+		$scope.recent_loaded = false;
 
 		$http.get(API_BASE + "/info/recent").success(function(data) {
 			$scope.recent = data.torrents;
+			$scope.recent_loaded = true;
 		});		
 
 		$scope.submitUrls = function() {

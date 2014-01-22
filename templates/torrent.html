@@ -1,5 +1,6 @@
 <h2>Info for {{ hash }}</h2>
-<div>
+<p ng-hide="info_loaded">Loading... <ajax-loader indicator="info_loaded"></ajax-loader></p>
+<div ng-show="info_loaded">
 	<table class="table table-condensed">
 		<tr>
 			<td><strong>Name:</strong> {{ info.name }}</td>

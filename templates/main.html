@@ -20,9 +20,9 @@
 			</li>
 		</ul>
 	</div>
-	<div ng-if="recent.length">
-		<h2>Recent Torrents</h2>
-		<table class="table table-condensed">
+	<div>
+		<h2>Recent Torrents <ajax-loader indicator="recent_loaded"></ajax-loader></h2>
+		<table class="table table-condensed" ng-if="recent.length">
 			<tr>
 				<th>Hash</th>
 				<th>Name</th>

@@ -5,6 +5,7 @@
 		$scope.hash = $routeParams.hash;
 
 		$scope.info = {};
+		$scope.info_loaded = false;
 
 		$scope.refresh = function($event) {
 			if ($event) {
@@ -13,10 +14,11 @@
 
 			$http.get(API_BASE + "/info/refresh/" + $scope.hash).success(function(data) {
 				$http.get(API_BASE + "/info/" + $scope.hash).success(function(data) {
-					$scope.info = data.torrent;			
+					$scope.info = data.torrent;
+					$scope.info_loaded = true;
 				}).error(function(data) {
 					$rootScope.error += data.message;
-				});	
+				});
 			});
 				
 		};

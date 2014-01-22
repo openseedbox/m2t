@@ -3,6 +3,7 @@
 	<head>
 		<title>M2T - Magnet to Torrent Converter</title>
 		<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" />
+		<link ng-repeat="item in require_css" rel="stylesheet" type="text/css" ng-href="css/{{ item }}" />
 		<link id="api_base" href="http://m2t.liquid-awesome.net/api" />
 	</head>
 	<body ng-controller="MainController">
@@ -27,5 +28,6 @@
 		<script type="text/javascript" src="js/MainController.js"></script>
 		<script type="text/javascript" src="js/TorrentController.js"></script>
 		<script type="text/javascript" src="js/DocsController.js"></script>
+		<script type="text/javascript" src="js/directives/AjaxLoader.js"></script>
 	</body>
 </html>
