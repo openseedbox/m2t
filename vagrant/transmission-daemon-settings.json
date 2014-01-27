@@ -1,0 +1,9 @@
+{
+	"download-dir" : "/dev/null",
+	"incomplete-dir-enabled" : false,
+	"rpc-enabled" : true,
+	"rpc-bind-address" : "0.0.0.0",
+	"rpc-port" : 9091,
+	"rpc-authentication-required" : false,
+	"rpc-whitelist-enabled" : false
+}
