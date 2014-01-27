@@ -50,14 +50,31 @@ echo "Setting up m2t"
 a2dissite 000-default
 mkdir -p /var/www/m2t
 mkdir -p /var/www/m2t-interface
-cp -r /m2t/ /var/www
-cp -r /m2t/* /var/www/m2t-interface
+cd /var/www/m2t
+
+echo "Cloning m2t api"
+git clone https://github.com/openseedbox/m2t.git . 2>&1
+
+echo "Installing composer"
+php -r "eval('?>'.file_get_contents('https://getcomposer.org/installer'));"
+mv composer.phar /usr/bin/composer
+
+echo "Configuring m2t api"
+composer --no-dev install
+php artisan migrate
+
+echo "Cloning m2t web interface"
 cd /var/www/m2t-interface
-git checkout gh-pages
+git clone https://github.com/openseedbox/m2t.git . 2>&1
+git checkout gh-pages 2>&1
 chown -R www-data /var/www
 chgrp -R www-data /var/www
+
+echo "Copying up apache config"
 cp /vagrant/m2t.conf /etc/apache2/sites-available
 cp /vagrant/m2t-interface.conf /etc/apache2/sites-available
 a2ensite m2t
 a2ensite m2t-interface
+
+echo "Restarting apache"
 service apache2 reload
