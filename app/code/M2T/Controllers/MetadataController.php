@@ -8,7 +8,7 @@ use \Response;
 
 class MetadataController extends BaseController {
 
-	public function getIndex($hash) {
+	public function getIndex($hash = null) {
 		$validator = $this->getValidator($hash);
 		if ($validator->fails()) { return $this->error($validator); }
 		$torrent = $this->getTorrent($hash);
@@ -19,7 +19,7 @@ class MetadataController extends BaseController {
 		));
 	}
 
-	public function getFile($hash) {
+	public function getFile($hash = null) {
 		$validator = $this->getValidator($hash);
 		if ($validator->fails()) { return $this->error($validator); }
 		$torrent = $this->getTorrent($hash);

@@ -50,14 +50,20 @@ echo "Setting up m2t"
 a2dissite 000-default
 mkdir -p /var/www/m2t
 mkdir -p /var/www/m2t-interface
-cd /var/www/m2t
 
 echo "Cloning m2t api"
-git clone https://github.com/openseedbox/m2t.git . 2>&1
+cd /var/www/m2t
+if [ -e ".git" ]; then
+	git pull
+else
+	git clone https://github.com/openseedbox/m2t.git . 2>&1
+fi
 
-echo "Installing composer"
-php -r "eval('?>'.file_get_contents('https://getcomposer.org/installer'));"
-mv composer.phar /usr/bin/composer
+if [ ! -e "/usr/bin/composer" ]; then
+	echo "Installing composer"
+	php -r "eval('?>'.file_get_contents('https://getcomposer.org/installer'));"
+	mv composer.phar /usr/bin/composer
+fi
 
 echo "Configuring m2t api"
 composer --no-dev install
@@ -68,8 +74,12 @@ php artisan migrate
 
 echo "Cloning m2t web interface"
 cd /var/www/m2t-interface
-git clone https://github.com/openseedbox/m2t.git . 2>&1
-git checkout gh-pages 2>&1
+if [ -e ".git" ]; then
+	git pull
+else
+	git clone https://github.com/openseedbox/m2t.git . 2>&1
+	git checkout gh-pages 2>&1
+fi
 cp /vagrant/api_location.js js/api_location.js
 chown -R www-data /var/www
 chgrp -R www-data /var/www
@@ -83,3 +93,5 @@ a2enmod rewrite
 
 echo "Restarting apache"
 service apache2 reload
+
+echo "Everything is set up! http://localhost:8081 is the web interface, and http://localhost:8082 is the API"

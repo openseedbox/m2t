@@ -18,8 +18,8 @@ class ApiTestCase extends TestCase {
 		$this->assertArrayHasKey("message", $this->json_response);
 	}
 
-	protected function assertResponseErrorMessage($message) {		
+	protected function assertResponseErrorMessage($message) {
 		$this->assertEquals($message, $this->json_response["message"]);
 	}
-	
+
 }

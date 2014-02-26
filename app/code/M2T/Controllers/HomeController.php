@@ -14,4 +14,8 @@ class HomeController extends Controller {
 		return Redirect::route("index");
 	}
 
+	public function missingMethod($params = array()) {		
+		return "No such method: {$params[0]}";
+	}
+
 }

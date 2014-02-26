@@ -107,6 +107,7 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'M2T\Services\M2TServiceProvider',
+		'M2T\Services\TransmissionBackendServiceProvider',
 	),
 
 	/*

@@ -14,19 +14,25 @@ class Transmission implements BackendInterface {
 		$this->transmission = new TransmissionRPC(Config::get("transmission"));
 	}
 
-	public function addTorrent(TorrentInterface $torrent) {			
+	/**
+	 * @inheritDoc
+	 */
+	public function addTorrent(TorrentInterface $torrent) {
 		$opts = array(
 			"download-dir" => "/dev/null"
 		);
 		if ($torrent->isFromMagnet()) {
-			$this->transmission->add($torrent->getMagnetUri(), false, $opts);			
+			$this->transmission->add($torrent->getMagnetUri(), false, $opts);
 		} else {
 			$opts["paused"] = true;
 			$this->transmission->add($torrent->getBase64Metadata(), true, $opts);
 		}
-		return $torrent;		
+		return $torrent;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function isMetainfoComplete(TorrentInterface $torrent) {
 		$response = $this->transmission->get($torrent->getInfoHash(), array("metadataPercentComplete"));
 		if (!$this->torrentPresentIn($response)) {
@@ -40,9 +46,12 @@ class Transmission implements BackendInterface {
 		return ($complete == 1);
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function getMetainfoAndFiles(TorrentInterface $torrent) {
-		$response = $this->transmission->get($torrent->getInfoHash(), array("name", "totalSize", "files", "metainfo"));	
-		if (!$this->torrentPresentIn($response)) {			
+		$response = $this->transmission->get($torrent->getInfoHash(), array("name", "totalSize", "files", "metainfo"));
+		if (!$this->torrentPresentIn($response)) {
 			$this->addTorrent($torrent);
 			return null;
 		}
@@ -53,27 +62,30 @@ class Transmission implements BackendInterface {
 		$torrent->setTotalSizeBytes($t["totalSize"]);
 
 		$torrent->clearFiles();
-		foreach ($t["files"] as $file) {				
+		foreach ($t["files"] as $file) {
 			$f = $torrent->newFile();
 			$f->setName(basename($file["name"]));
 			$f->setLengthBytes($file["length"]);
 			$f->setFullLocation($file["name"]);
-			$torrent->addFile($f);					
+			$torrent->addFile($f);
 		}
 
-		return $torrent;		
+		return $torrent;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function getTrackerStats(TorrentInterface $torrent) {
 		if ($stats = $this->getTrackerStatsFor($torrent->getInfoHash())) {
 			$torrent->clearTrackers();
-			foreach ($stats as $tracker) {			
+			foreach ($stats as $tracker) {
 				$t = $torrent->newTracker();
 				$t->setTrackerUrl($tracker["host"]);
 				$t->setSeedCount($tracker["seederCount"]);
 				$t->setLeecherCount($tracker["leecherCount"]);
 				$t->setCompletedCount($tracker["downloadCount"]);
-				$t->setMessage($tracker["lastAnnounceResult"]);					
+				$t->setMessage($tracker["lastAnnounceResult"]);
 				$torrent->addTracker($t);
 			}
 		} else {
@@ -91,12 +103,12 @@ class Transmission implements BackendInterface {
 	private function getTrackerStatsFor($hash) {
 		if (!$this->tracker_stats) {
 			$this->tracker_stats = $this->transmission->get("all", array("hashString", "trackerStats"));
-		}		
-		foreach ($this->tracker_stats["torrents"] as $torrent) {			
+		}
+		foreach ($this->tracker_stats["torrents"] as $torrent) {
 			if ($torrent["hashString"] == $hash) {
 				return $torrent["trackerStats"];
 			}
-		}		
+		}
 	}
 
 }

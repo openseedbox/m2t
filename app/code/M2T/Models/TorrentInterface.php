@@ -29,7 +29,7 @@ interface TorrentInterface extends ParserTorrentInterface, ArrayableInterface {
 	 * Sets the torrents Base64 metadata. This is the torrent file, encoded as base64
 	 * @param string $metadata
 	 */
-	public function setBase64Metadata($metadata);	
+	public function setBase64Metadata($metadata);
 
 	/**
 	 * Returns the date the torrent was added to the system
@@ -51,9 +51,9 @@ interface TorrentInterface extends ParserTorrentInterface, ArrayableInterface {
 
 	/**
 	 * Indicates whether or not the base64_metadata is populated
-	 * @return boolean 
+	 * @return boolean
 	 */
-	public function hasMetadata();	
+	public function hasMetadata();
 
 	/**
 	 * Returns a new FileInterface instance bound to this torrent
@@ -78,7 +78,7 @@ interface TorrentInterface extends ParserTorrentInterface, ArrayableInterface {
 	/**
 	 * Adds a new tracker to this torrent. The tracker should have been created with newTracker() for compatibility.
 	 * @param M2T\Models\FileInterface $tracker
-	 */	
+	 */
 	public function addTracker(TrackerInterface $tracker);
 
 	/**

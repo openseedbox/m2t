@@ -6,6 +6,11 @@ use Guzzle\Http\Message\Response as GuzzleResponse;
 
 class TorrentRepositoryTest extends TestCase {
 
+	/**
+	 * @inheritDoc
+	 */
+	protected $mock_repo = false;
+
 	public function setUp() {
 		parent::setUp();
 
@@ -20,7 +25,7 @@ class TorrentRepositoryTest extends TestCase {
 	public function testCanAddMagnet() {
 		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
 		$magnet = "magnet:?xt=urn:btih:{$hash}&dn=Pioneer+One+S01E01+720p+x264+VODO&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337";
-		
+
 		$torrent = $this->repo->add($magnet);
 		$this->assertNotNull($torrent);
 		$this->assertInstanceOf("M2T\Models\TorrentInterface", $torrent);
@@ -50,7 +55,7 @@ class TorrentRepositoryTest extends TestCase {
 	public function testCanAddBase64() {
 		$metadata = $this->getBase64Metadata();
 
-		$torrent = $this->repo->add($metadata);	
+		$torrent = $this->repo->add($metadata);
 		$this->assertNotNull($torrent);
 		$this->assertInstanceOf("M2T\Models\TorrentInterface", $torrent);
 		$this->assertEquals("91c1c0ad9fba72d28a4e91e5ed42e9fae0c03781", $torrent->getInfoHash());
@@ -60,7 +65,7 @@ class TorrentRepositoryTest extends TestCase {
 		$this->assertCount(5, $torrent->getTrackerUrls());
 		$this->assertEquals("udp://tracker.openbittorrent.com:80", $torrent->getTrackerUrls()[0]);
 		$this->assertCount(5, $torrent->getTrackers());
-		$this->assertEquals("udp://tracker.openbittorrent.com:80", $torrent->getTrackers()->first()->getTrackerUrl());		
+		$this->assertEquals("udp://tracker.openbittorrent.com:80", $torrent->getTrackers()->first()->getTrackerUrl());
 	}
 
 	public function testCanAddHash() {
@@ -135,7 +140,7 @@ class TorrentRepositoryTest extends TestCase {
 		$torrent = $this->repo->findByHash($hash);
 
 		$this->assertNotEquals($hash, $torrent->getName());
-		$this->assertEquals($filename, $torrent->getName());		
+		$this->assertEquals($filename, $torrent->getName());
 	}
 
 	private function mockHttpClient(array $data) {

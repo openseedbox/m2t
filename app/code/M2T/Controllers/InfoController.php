@@ -6,15 +6,12 @@ use M2T\Models\TorrentRepositoryInterface;
 
 class InfoController extends BaseController {
 
-	public function getIndex($hash) {		
+	public function getIndex($hash) {
 		$validator = $this->getValidator($hash);
 		if ($validator->fails()) {
 			return $this->error($validator);
 		}
 		$torrent = $this->torrents->findByHash($hash);
-		if (!$torrent) {
-			return $this->errorInvalidHash($hash);
-		}
 		return $this->success(array("torrent" => $torrent->toArray()));
 	}
 
@@ -24,10 +21,6 @@ class InfoController extends BaseController {
 
 	public function getRefresh($hash) {
 		\Artisan::call("m2t:check", array("hash" => $hash));
-	}
-
-	private function errorInvalidHash($hash) {
-		return $this->error("Hash empty or invalid: $hash");
 	}
 
 }

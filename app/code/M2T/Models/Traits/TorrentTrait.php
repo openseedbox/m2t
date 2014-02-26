@@ -16,12 +16,12 @@ trait TorrentTrait {
 		$data = array(
 			"has-metadata" => $this->hasMetadata(),
 			"hash" => $this->getInfoHash(),
-			"name" => $this->getName()			
+			"name" => $this->getName()
 		);
 		if (!$this->hasMetadata()) {
 			return $data;
-		}		
-		return array_merge($data, array(						
+		}
+		return array_merge($data, array(
 			"download-link" => $this->getDownloadLink(),
 			"total-size-bytes" => $this->getTotalSizeBytes(),
 			"total-size-human" => $formatter->format($this->getTotalSizeBytes()),

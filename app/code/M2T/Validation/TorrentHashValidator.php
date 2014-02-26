@@ -11,7 +11,9 @@ class TorrentHashValidator extends Validator {
 	}
 
 	public function validateHashInDb($attribute, $value, $parameters) {
-		return $this->validateExists($attribute, $value, array("torrents", "hash"));
+		$repo = \App::make("M2T\Models\TorrentRepositoryInterface");
+		$torrent = $repo->findByHash($value);
+		return ($torrent != null);		
 	} 
 
 }
