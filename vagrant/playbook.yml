@@ -1,0 +1,145 @@
+---
+- hosts: all
+
+  vars:
+    transmisson_src_dir: /home/vagrant/src/transmission
+    m2t_src_dir: /var/www/m2t
+    m2t_interface_src_dir: /var/www/m2t-interface
+
+  tasks:
+    - name: ensure system is at latest versions
+      apt: update-cache=yes upgrade=full
+
+    - name: install python-pycurl for apt_repository module
+      apt: pkg=python-pycurl
+
+    - name: add repository for usable version of php
+      apt_repository: repo="ppa:ondrej/php5"
+
+    - name: install usable version of php
+      apt: pkg=php5
+
+    - name: install required php modules
+      apt: pkg={{ item }}
+      with_items:
+        - php5-mcrypt
+        - php5-curl
+        - php5-mysqlnd
+
+    - name: install apache
+      apt: pkg=apache2
+
+    - name: install mysql
+      apt: pkg=mysql-server
+
+    - name: install transmission-daemon deps
+      apt: pkg={{ item }}
+      with_items:
+        - build-essential
+        - subversion
+        - autoconf
+        - libtool
+        - pkg-config
+        - libcurl4-openssl-dev
+        - libevent-dev
+        - gettext
+        - intltool
+
+    - name: fetch transmission-daemon source
+      subversion: repo=svn://svn.transmissionbt.com/Transmission/tags/2.82 dest={{ transmisson_src_dir }}
+
+    - name: fetch transmission-daemon metainfo patch
+      get_url: url=https://trac.transmissionbt.com/raw-attachment/ticket/5547/svndiff.diff dest=/home/vagrant/src/transmission/metainfo-patch.diff
+
+    - name: apply transmission-daemon metainfo patch
+      command: patch -p0 libtransmission/rpcimpl.c metainfo-patch.diff chdir={{ transmisson_src_dir }}
+
+    - name: make po/Makefile.in.in so transmission-daemon compile doesnt fail
+      command: touch po/Makefile.in.in chdir={{ transmisson_src_dir }} creates=po/Makefile.in.in
+
+    - name: create transmission-daemon configure script
+      command: ./autogen.sh --disable-nls chdir={{ transmisson_src_dir }} creates=configure
+
+    - name: running make for transmission-daemon
+      command: make chdir={{ transmisson_src_dir }}
+
+    - name: installing transmission-daemon
+      command: make install chdir={{ transmisson_src_dir }}
+      sudo: true
+
+    - name: creating /etc/transmission-daemon
+      file: path=/etc/transmission-daemon state=directory owner=vagrant
+
+    - name: copying up transmission-daemon config
+      copy: src=transmission-daemon-settings.json dest=/etc/transmission-daemon/settings.json
+
+    - name: copying up transmission-daemon upstart script
+      copy: src=transmission-daemon.conf dest=/etc/init
+      sudo: true
+
+    - name: restart transmission-daemon service
+      service: name=transmission-daemon state=restarted
+
+    - name: disabling apache default site
+      command: a2dissite 000-default
+
+    - name: make m2t dir
+      file: path={{ m2t_src_dir }} owner=www-data state=directory
+
+    - name: make m2t-interface dir
+      file: path={{ m2t_interface_src_dir }} owner=www-data state=directory
+
+    - name: install git
+      apt: pkg=git
+
+    - name: clone m2t api
+      git: repo=https://github.com/openseedbox/m2t.git dest={{ m2t_src_dir }}
+
+    - name: clone m2t interface
+      git: repo=https://github.com/openseedbox/m2t.git dest={{ m2t_interface_src_dir }} version=gh-pages
+
+    - name: install composer
+      command: php -r "eval('?>'.file_get_contents('https://getcomposer.org/installer'));" chdir=/home/vagrant creates=/home/vagrant/composer.phar
+
+    - name: move composer to /usr/bin
+      command: cp composer.phar /usr/bin/composer chdir=/home/vagrant creates=/usr/bin/composer
+
+    - name: install m2t api deps
+      command: composer --no-dev install chdir={{ m2t_src_dir }}
+
+    - name: install python mysqldb module so ansible can manipulate mysql
+      apt: pkg=python-mysqldb
+
+    - name: create mysql db
+      mysql_db: name=m2t login_user=root login_password=
+
+    - name: create mysql user
+      mysql_user: name=openseedbox password=password login_user=root login_password= priv=m2t.*:ALL
+
+    - name: run m2t api migrations
+      command: php artisan migrate chdir={{ m2t_src_dir }}
+
+    - name: copy up m2t config
+      copy: src=m2t.conf dest=/etc/apache2/sites-available
+      sudo: true
+
+    - name: copy up m2t-interface config
+      copy: src=m2t-interface.conf dest=/etc/apache2/sites-available
+
+    - name: copy up m2t-interface api location
+      copy: api_location.js js/api_location.js chdir={{ m2t_interface_src_dir }}
+
+    - name: enable rewrite module in apache
+      command: a2enmod rewrite
+
+    - name: enable m2t site in apache
+      command: a2ensite m2t
+
+    - name: enable m2t-interface site in apache
+      command: a2ensite m2t-interface
+
+    - name: restart apache
+      service: name=apache2 state=reloaded
+
+    - name: success
+      command: echo "Everything is set up! http://localhost:8081 is the web interface, and http://localhost:8082 is the API"

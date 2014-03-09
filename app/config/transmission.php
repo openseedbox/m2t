@@ -1,6 +1,6 @@
 <?php
 
 return array(
-	'host' => 'http://127.0.0.1:9091',	
-	'endpoint' => 'transmission/rpc'
+	'host' => "http://" . $_ENV['TRANSMISSION_HOST'] . ":" . $_ENV['TRANSMISSION_PORT'],
+	'endpoint' => $_ENV["TRANSMISSION_ENDPOINT"]
 );

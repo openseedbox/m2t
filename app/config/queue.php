@@ -36,9 +36,9 @@ return array(
 
 		'beanstalkd' => array(
 			'driver' => 'beanstalkd',
-			'host'   => '127.0.0.1',
-			"port" => 11300,
-			'queue'  => 'm2t'
+			'host'   => $_ENV["BEANSTALKD_HOST"],
+			'port' => $_ENV["BEANSTALKD_PORT"],
+			'queue'  => $_ENV["BEANSTALKD_QUEUE"]
 		),
 
 		'sqs' => array(
