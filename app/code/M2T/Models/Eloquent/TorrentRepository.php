@@ -65,6 +65,16 @@ class TorrentRepository implements TorrentRepositoryInterface {
 		return EloquentTorrent::orderBy("created_at", "DESC")->take($limit)->get();
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function persist(TorrentInterface $torrent) {
+		if (!($torrent instanceof EloquentTorrent)) {
+			throw new \Exception("Dont know how to persist torrents of class " . get_class($torrent));
+		}
+		return $torrent->save();
+	}
+
 	private function addFromHash($hash) {
 		return $this->addFromMagnet($this->magnet_parser->create($hash));
 	}
@@ -93,15 +103,15 @@ class TorrentRepository implements TorrentRepositoryInterface {
 
 		$this->addTrackersIfPresent($torrent, $ret);
 
-		$this->queueAddToBackend($ret);
-		
+		//$this->queueAddToBackend($ret);
+
 		return $ret;
 	}
 
 	private function getDataArray(TorrentParserInterface $torrent) {
 		$data = array(
 			"name" => $torrent->getName(),
-			"hash" => $torrent->getInfoHash()			
+			"hash" => $torrent->getInfoHash()
 		);
 
 		if ($torrent->isFromMagnet()) {
@@ -133,7 +143,7 @@ class TorrentRepository implements TorrentRepositoryInterface {
 				foreach ($trackers as $tracker_url) {
 					$tracker = $ret->newTracker();
 					$tracker->setTrackerUrl($tracker_url);
-					$ret->addTracker($tracker);					
+					$ret->addTracker($tracker);
 				}
 			});
 		}
@@ -141,12 +151,6 @@ class TorrentRepository implements TorrentRepositoryInterface {
 		return $ret;
 	}
 
-	private function queueAddToBackend(TorrentInterface $ret) {
-		//queue a job to get the metadata if required
-		/*
-		if (!$ret->in_transmission) {			
-			Queue::push("jobs.add_torrent", array("hash" => $ret->getInfoHash()));
-		}*/
-	}
+
 
 }

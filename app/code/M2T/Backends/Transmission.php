@@ -3,15 +3,18 @@
 namespace M2T\Backends;
 
 use M2T\Models\TorrentInterface;
+use Illuminate\Support\Collection;
 use Vohof\Transmission as TransmissionRPC;
 use \Config;
 
 class Transmission implements BackendInterface {
 
-	private $tracker_stats = null;
-
-	public function __construct() {
-		$this->transmission = new TransmissionRPC(Config::get("transmission"));
+	public function __construct($transmission = null) {
+		if (!$transmission) {
+			$this->transmission = new TransmissionRPC(Config::get("transmission"));
+		} else {
+			$this->transmission = $transmission;
+		}
 	}
 
 	/**
@@ -35,10 +38,9 @@ class Transmission implements BackendInterface {
 	 */
 	public function isMetainfoComplete(TorrentInterface $torrent) {
 		$response = $this->transmission->get($torrent->getInfoHash(), array("metadataPercentComplete"));
-		if (!$this->torrentPresentIn($response)) {
-			$this->addTorrent($torrent);
-			return $this->isMetainfoComplete($torrent);
-		}
+
+		$this->throwExceptionIfTorrentNotPresentIn($response, $torrent);
+
 		$complete = $response["torrents"][0]["metadataPercentComplete"];
 		if ($complete == 1) {
 			$this->transmission->action("stop", $torrent->getInfoHash()); //stop wasting bandwidth by downloading to /dev/null
@@ -51,10 +53,8 @@ class Transmission implements BackendInterface {
 	 */
 	public function getMetainfoAndFiles(TorrentInterface $torrent) {
 		$response = $this->transmission->get($torrent->getInfoHash(), array("name", "totalSize", "files", "metainfo"));
-		if (!$this->torrentPresentIn($response)) {
-			$this->addTorrent($torrent);
-			return null;
-		}
+
+		$this->throwExceptionIfTorrentNotPresentIn($response, $torrent);
 
 		$t = $response["torrents"][0];
 		$torrent->setBase64Metadata($t["metainfo"]);
@@ -77,38 +77,60 @@ class Transmission implements BackendInterface {
 	 * @inheritDoc
 	 */
 	public function getTrackerStats(TorrentInterface $torrent) {
-		if ($stats = $this->getTrackerStatsFor($torrent->getInfoHash())) {
-			$torrent->clearTrackers();
-			foreach ($stats as $tracker) {
-				$t = $torrent->newTracker();
-				$t->setTrackerUrl($tracker["host"]);
-				$t->setSeedCount($tracker["seederCount"]);
-				$t->setLeecherCount($tracker["leecherCount"]);
-				$t->setCompletedCount($tracker["downloadCount"]);
-				$t->setMessage($tracker["lastAnnounceResult"]);
-				$torrent->addTracker($t);
-			}
-		} else {
-			//if there were no stats, the torrent probably wasnt added. Add it.
-			$this->addTorrent($torrent);
-		}
+		$response = $this->transmission->get($torrent->getInfoHash(), array("trackerStats"));
+
+		$this->throwExceptionIfTorrentNotPresentIn($response, $torrent);
+
+		$stats = $response["torrents"][0]["trackerStats"];
+
+		$this->populateTorrentWithTrackerStats($stats, $torrent);
 
 		return $torrent;
 	}
 
-	private function torrentPresentIn(array $response) {
-		return count($response["torrents"]) > 0;
-	}
+	/**
+	 * @inheritDoc
+	 */
+	public function getTrackerStatsForMultiple(Collection $torrents) {
+		$hashes = array();
 
-	private function getTrackerStatsFor($hash) {
-		if (!$this->tracker_stats) {
-			$this->tracker_stats = $this->transmission->get("all", array("hashString", "trackerStats"));
-		}
-		foreach ($this->tracker_stats["torrents"] as $torrent) {
-			if ($torrent["hashString"] == $hash) {
-				return $torrent["trackerStats"];
+		$torrents->each(function($torrent) use (&$hashes) {
+			$hashes[] = $torrent->getInfoHash();
+		});
+
+		$response = $this->transmission->get($hashes, array("hashString", "trackerStats"));
+
+		foreach ($response["torrents"] as $responseTorrent) {
+			$match = $torrents->filter(function($torrent) use ($responseTorrent) {
+				return ($responseTorrent["hashString"] == $torrent->getInfoHash());
+			})->first();
+			if ($match) {
+				$this->populateTorrentWithTrackerStats($responseTorrent["trackerStats"], $match);
 			}
 		}
+
+		return $torrents;
+	}
+
+	private function throwExceptionIfTorrentNotPresentIn(array $response, TorrentInterface $torrent) {
+		$present = count($response["torrents"]) > 0;
+		if (!$present) {
+			throw new TorrentNotPresentException("Torrent {$torrent->getInfoHash()} is not present in the backend.");
+		}
+	}
+
+	private function populateTorrentWithTrackerStats(array $stats, TorrentInterface $torrent) {
+		$torrent->clearTrackers();
+		foreach ($stats as $tracker) {
+			$t = $torrent->newTracker();
+			$t->setTrackerUrl($tracker["host"]);
+			$t->setSeedCount($tracker["seederCount"]);
+			$t->setLeecherCount($tracker["leecherCount"]);
+			$t->setCompletedCount($tracker["downloadCount"]);
+			$t->setMessage($tracker["lastAnnounceResult"]);
+			$torrent->addTracker($t);
+		}
+		return $torrent;
 	}
 
 }

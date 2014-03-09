@@ -15,7 +15,7 @@ interface TorrentRepositoryInterface {
 	 * Return a list of all the torrents in the system
 	 * @return Illuminate\Support\Collection<M2T\Models\TorrentInterface>
 	 */
-	public function all();		
+	public function all();
 
 	/**
 	 * Find a torrent by its info_hash
@@ -30,5 +30,11 @@ interface TorrentRepositoryInterface {
 	 * @return Illuminate\Support\Collection<M2T\Models\TorrentInterface>
 	 */
 	public function getRecent($limit = 10);
-	
+
+	/**
+	 * Persists a TorrentInterface to the data store
+	 * @param TorrentInterface $torrent The torrent to persist
+	 */
+	public function persist(TorrentInterface $torrent);
+
 }

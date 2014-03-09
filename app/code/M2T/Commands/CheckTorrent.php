@@ -12,10 +12,12 @@ class CheckTorrent extends BaseCommand {
 		$this->validateHash();
 		if ($torrent = $this->getTorrent()) {
 			$hash = $torrent->getInfoHash();
-			if ($this->transmission->isMetainfoComplete($torrent)) {
-				$this->transmission->getMetainfoAndFiles($torrent);
-				$torrent->save();
+			if ($this->backend->isMetainfoComplete($torrent)) {
+				$this->backend->getMetainfoAndFiles($torrent);
+				$this->torrents->persist($torrent);
 				$this->info("Updated $hash with metainfo and files");
+			} else {
+				$this->info("Did not update $hash as metadata is not yet complete");
 			}
 		}
 	}

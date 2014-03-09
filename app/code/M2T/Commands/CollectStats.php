@@ -8,23 +8,24 @@ use Symfony\Component\Console\Input\InputArgument;
 use \DB;
 
 class CollectStats extends BaseCommand {
-	
+
 	protected $name = 'm2t:stats';
 
 	protected $description = 'Loops over all the known torrents and grabs their seeder/leecher/complete stats';
 
 	public function fire() {
 		$hash = $this->argument("hash");
+		if ($hash) {
+			$this->validateHash();
+		}
 		$self = $this;
 		if ($hash && $torrent = $this->getTorrent()) {
 			$this->updateTrackersFor($torrent);
 		} else {
 			$torrents = $this->torrents->all();
-			DB::transaction(function() use ($torrents, $self) {
-				foreach ($torrents as $torrent) {
-					$self->updateTrackersFor($torrent);
-				}
-			});
+			foreach ($torrents as $torrent) {
+				$self->updateTrackersFor($torrent);
+			}
 			$this->info("All stats updated.");
 		}
 	}
@@ -36,9 +37,9 @@ class CollectStats extends BaseCommand {
 	}
 
 	private function updateTrackersFor(TorrentInterface $torrent) {
-		$this->transmission->getTrackerStats($torrent);
-		$torrent->save();
+		$this->backend->getTrackerStats($torrent);
+		$this->torrents->persist($torrent);
 		$this->info("Updated tracker stats for: {$torrent->getInfoHash()}");
 	}
-	
+
 }

@@ -4,6 +4,8 @@ use M2T\Commands\AddTorrent;
 
 class AddTorrentTest extends CommandTestCase {
 
+	use HashParameterTestTrait;
+
 	public function setUp() {
 		parent::setUp();
 
