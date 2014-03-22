@@ -94,7 +94,14 @@ interface TorrentInterface extends ParserTorrentInterface, ArrayableInterface {
 
 	/**
 	 * Returns an absolute download link for the torrent. A user should be able to make a GET request to this link to retrieve the torrent.
+	 * @return string
 	 */
 	public function getDownloadLink();
+
+	/**
+	 * Returns a timestamp of when the torrent was last updated. Should be in the format Y-m-d H:i, eg 2013-01-16 14:23
+	 * @return string
+	 */
+	public function getLastUpdated();
 
 }

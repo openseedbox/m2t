@@ -21,6 +21,8 @@ class InfoController extends BaseController {
 
 	public function getRefresh($hash) {
 		\Artisan::call("m2t:check", array("hash" => $hash));
+		\Artisan::call("m2t:stats", array("hash" => $hash));
+		return $this->success(array("refreshed" => $hash));
 	}
 
 }

@@ -67,7 +67,7 @@ class Torrent extends Eloquent implements TorrentInterface {
 
 	public function getCreateDate() {
 		return $this->created_at;
-	}	
+	}
 
 	public function getTrackers() {
 		return $this->trackers()->get();
@@ -92,7 +92,7 @@ class Torrent extends Eloquent implements TorrentInterface {
 	}
 
 	public function clearTrackers() {
-		$trackers = $this->getTrackers();		
+		$trackers = $this->getTrackers();
 		DB::transaction(function() use ($trackers) {
 			$trackers->each(function($tracker) {
 				$tracker->delete();
@@ -123,7 +123,7 @@ class Torrent extends Eloquent implements TorrentInterface {
 		Tracker::create(array(
 			"tracker_url" => $tracker->getTrackerUrl(),
 			"seeds" => $tracker->getSeedCount(),
-			"leeches" => $tracker->getLeecherCount(),
+			"leechers" => $tracker->getLeecherCount(),
 			"completed" => $tracker->getCompletedCount(),
 			"message" => $tracker->getMessage(),
 			"torrent_id" => $this->id
@@ -144,6 +144,12 @@ class Torrent extends Eloquent implements TorrentInterface {
 			unset($data["name"]);
 		}
 		return parent::update($data);
-	}	
+	}
+
+	public function getLastUpdated() {
+		if ($this->updated_at) {
+			return $this->updated_at->format("Y-m-d H:i");
+		}
+	}
 
 }

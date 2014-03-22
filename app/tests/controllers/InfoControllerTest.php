@@ -37,4 +37,16 @@ class InfoControllerTest extends ApiTestCase {
 		$this->assertCount(3, $response["torrents"]);
 	}
 
+	public function testGetRefresh() {
+		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
+		\Artisan::shouldReceive("call")->with("m2t:check", array("hash" => $hash));
+		\Artisan::shouldReceive("call")->with("m2t:stats", array("hash" => $hash));
+
+		$response = $this->makeRequest("api/info/refresh/$hash");
+		$this->assertResponseOk();
+		$this->assertResponseSuccess();
+		$this->assertArrayHasKey("refreshed", $response);
+		$this->assertEquals($hash, $response["refreshed"]);
+	}
+
 }

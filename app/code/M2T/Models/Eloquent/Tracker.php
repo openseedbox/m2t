@@ -16,10 +16,12 @@ class Tracker extends Eloquent implements TrackerInterface {
 
 	protected $hidden = array("torrent_id", "id");
 
+	protected $touches = array("torrent");
+
 	public $timestamps = false;
 
 	protected function torrent() {
-		return $this->belongsTo(get_class("Torrent"));
+		return $this->belongsTo("M2T\Models\Eloquent\Torrent");
 	}
 
 	public function getTorrent() {

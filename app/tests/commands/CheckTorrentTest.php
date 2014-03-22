@@ -1,6 +1,7 @@
 <?php
 
 use M2T\Commands\CheckTorrent;
+use M2T\Backends\TorrentNotPresentException;
 
 class CheckTorrentTest extends CommandTestCase {
 

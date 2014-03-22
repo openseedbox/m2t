@@ -13,7 +13,7 @@ class ApiTestCase extends TestCase {
 	}
 
 	protected function assertResponseError($status = 400) {
-		$this->assertResponseStatus($status);
+		$this->assertResponseStatus($status, $this->client->getResponse());
 		$this->assertFalse($this->json_response["success"]);
 		$this->assertArrayHasKey("message", $this->json_response);
 	}

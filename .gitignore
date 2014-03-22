@@ -6,3 +6,4 @@ Thumbs.db
 .vagrant
 .env.local.php
 .env.testing.php
+.env.php

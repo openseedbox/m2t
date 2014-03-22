@@ -3,14 +3,14 @@
 use M2T\Models\Eloquent\Torrent;
 use Illuminate\Support\Collection;
 
-class TorrentTest extends PHPUnit_Framework_TestCase {	
+class TorrentTest extends PHPUnit_Framework_TestCase {
 
 	public function testToArray() {
 		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
 
 		$torrent = new Torrent();
 		$torrent->setInfoHash($hash);
-		$torrent->setName("Test");		
+		$torrent->setName("Test");
 
 		$a = $torrent->toArray();
 
@@ -32,9 +32,9 @@ class TorrentTest extends PHPUnit_Framework_TestCase {
 		$torrent->setInfoHash($hash);
 		$torrent->setName("Test");
 		$torrent->setBase64Metadata("testmetadata");
-		$torrent->setTotalSizeBytes(400);		
+		$torrent->setTotalSizeBytes(400);
 
-		$a = $torrent->toArray();		
+		$a = $torrent->toArray();
 
 		$this->assertArrayHasKey("download-link", $a);
 		$this->assertArrayHasKey("total-size-bytes", $a);
@@ -49,7 +49,8 @@ class TorrentTest extends PHPUnit_Framework_TestCase {
 			"total-size-bytes" => 400,
 			"total-size-human" => "400 bytes",
 			"files" => array(),
-			"trackers" => array()
+			"trackers" => array(),
+			"last_updated" => null
 		), $a);
 
 	}
@@ -58,11 +59,11 @@ class TorrentTest extends PHPUnit_Framework_TestCase {
 		$hash = "07a9de9750158471c3302e4e95edb1107f980fa6";
 		$torrent = new Torrent();
 		$torrent->setInfoHash($hash);
-		
+
 		$link = $torrent->getDownloadLink();
 		$this->assertNotNull($link);
 		$this->assertContains("$hash.torrent", $link);
 		$this->assertContains("http://", $link);
 	}
-	
+
 }

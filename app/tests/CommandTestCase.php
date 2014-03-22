@@ -4,6 +4,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Output\Output;
 use Illuminate\Console\Command;
+use Illuminate\Console\Application as ConsoleApplication;
 
 class CommandTestCase extends TestCase {
 

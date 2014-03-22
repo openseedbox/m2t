@@ -103,8 +103,6 @@ class TorrentRepository implements TorrentRepositoryInterface {
 
 		$this->addTrackersIfPresent($torrent, $ret);
 
-		//$this->queueAddToBackend($ret);
-
 		return $ret;
 	}
 

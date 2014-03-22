@@ -2,6 +2,8 @@
 
 namespace M2T\Commands;
 
+use M2T\Backends\TorrentNotPresentException;
+
 class CheckTorrent extends BaseCommand {
 
 	protected $name = 'm2t:check';
@@ -12,12 +14,16 @@ class CheckTorrent extends BaseCommand {
 		$this->validateHash();
 		if ($torrent = $this->getTorrent()) {
 			$hash = $torrent->getInfoHash();
-			if ($this->backend->isMetainfoComplete($torrent)) {
-				$this->backend->getMetainfoAndFiles($torrent);
-				$this->torrents->persist($torrent);
-				$this->info("Updated $hash with metainfo and files");
-			} else {
-				$this->info("Did not update $hash as metadata is not yet complete");
+			try {
+				if ($this->backend->isMetainfoComplete($torrent)) {
+					$this->backend->getMetainfoAndFiles($torrent);
+					$this->torrents->persist($torrent);
+					$this->info("Updated $hash with metainfo and files");
+				} else {
+					$this->info("Did not update $hash as metadata is not yet complete");
+				}
+			} catch (TorrentNotPresentException $ex) {
+				$this->call("m2t:add", array("hash" => $torrent->getInfoHash()));
 			}
 		}
 	}

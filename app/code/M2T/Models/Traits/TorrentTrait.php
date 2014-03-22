@@ -26,7 +26,8 @@ trait TorrentTrait {
 			"total-size-bytes" => $this->getTotalSizeBytes(),
 			"total-size-human" => $formatter->format($this->getTotalSizeBytes()),
 			"files" => $this->getFiles()->toArray(),
-			"trackers" => $this->getTrackers()->toArray()
+			"trackers" => $this->getTrackers()->toArray(),
+			"last_updated" => $this->getLastUpdated()
 		));
 	}
 

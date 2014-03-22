@@ -4,10 +4,10 @@ namespace M2T\Controllers;
 
 use M2T\Models\TorrentInterface;
 
-class UploadController extends BaseController {	
+class UploadController extends BaseController {
 
-	public function getIndex($data = "") {
-		$data = trim($data);
+	public function getIndex() {
+		$data = trim(\Input::get("url"));
 		$error_message = "Please specify a magnet link, url, hash or base64 data.";
 		if ($data) {
 			$torrent = $this->torrents->add($data);
